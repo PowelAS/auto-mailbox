@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace AutoMailbox
 {
@@ -12,7 +13,7 @@ namespace AutoMailbox
         {
             foreach (var inQueue in ToArray().Reverse())
             {
-                if (inQueue.Username != username) continue;
+                if (!string.Equals(inQueue.Username, username, StringComparison.InvariantCultureIgnoreCase)) continue;
                 email = inQueue;
                 return true;
             }
