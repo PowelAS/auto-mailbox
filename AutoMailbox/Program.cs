@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 
@@ -17,13 +10,11 @@ namespace AutoMailbox
     {
         public static int Main(string[] args)
         {
-            var telemetryClient = new TelemetryClient();
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .WriteTo.File(@"logs\auto-mailbox.txt", rollingInterval: RollingInterval.Day)
                 .Enrich.FromLogContext()
-                .WriteTo.ApplicationInsightsTraces(telemetryClient)
                 .CreateLogger();
 
             try
@@ -45,6 +36,8 @@ namespace AutoMailbox
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseApplicationInsights()
+                .CaptureStartupErrors(true)
                 .UseStartup<Startup>()
                 .UseSerilog()
                 .Build();
